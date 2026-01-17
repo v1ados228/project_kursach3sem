@@ -1,0 +1,30 @@
+{% extends "school/base.html" %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+  <a class="btn btn-link ps-0 mb-3" href="{% url 'school:category_list' %}">
+    ← Назад к списку
+  </a>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h1 class="card-title mb-2">{{ category.name }}</h1>
+          <p class="card-text text-muted mb-0">
+            {{ category.description|default:"Описание отсутствует." }}
+          </p>
+        </div>
+        <span class="badge text-bg-primary">Категория</span>
+      </div>
+    </div>
+    <div class="card-footer bg-white d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="{% url 'school:category_edit' category.pk %}">
+        Редактировать
+      </a>
+      <a class="btn btn-outline-danger" href="{% url 'school:category_delete' category.pk %}">
+        Удалить
+      </a>
+    </div>
+  </div>
+{% endblock %}

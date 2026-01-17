@@ -1,0 +1,77 @@
+{% extends "school/base.html" %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+  <a class="btn btn-link ps-0 mb-3" href="{% url 'school:course_list' %}">
+    ← Назад к списку
+  </a>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h1 class="card-title mb-2">{{ course.title }}</h1>
+          {% if course.image %}
+            <img
+              src="{{ course.image.url }}"
+              class="img-fluid rounded mb-3 course-hero"
+              alt="{{ course.title }}"
+            >
+          {% endif %}
+          <p class="card-text text-muted mb-3">
+            {{ course.description }}
+          </p>
+          <div class="d-flex flex-wrap gap-3 text-muted small">
+            <span>Категория: {{ course.category.name }}</span>
+            <span>Преподаватель: {{ course.teacher.username|default:"—" }}</span>
+            <span>Уровень: {{ course.get_level_display }}</span>
+            <span>Цена: {{ course.price }} ₽</span>
+            <span>{{ course.start_date }} → {{ course.end_date }}</span>
+          </div>
+        </div>
+        {% if course.is_published %}
+          <span class="badge text-bg-success">Опубликован</span>
+        {% else %}
+          <span class="badge text-bg-secondary">Черновик</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card-footer bg-white d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="{% url 'school:course_edit' course.pk %}">
+        Редактировать
+      </a>
+      <a class="btn btn-outline-danger" href="{% url 'school:course_delete' course.pk %}">
+        Удалить
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-3">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h5 mb-0">Записи</h2>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'school:enrollment_add' %}">
+              + Записать
+            </a>
+          </div>
+          {% if enrollments %}
+            <ul class="list-group list-group-flush">
+              {% for enrollment in enrollments %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>{{ enrollment.user.username }}</span>
+                  <a class="btn btn-outline-secondary btn-sm" href="{% url 'school:enrollment_detail' enrollment.pk %}">
+                    Открыть
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="alert alert-info mb-0">Записей пока нет.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "school/base.html" %}
+
+{% block title %}Курсы{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="mb-1">Курсы</h1>
+      <p class="text-muted mb-0">Каталог курсов онлайн-школы</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'school:course_add' %}">
+      + Добавить
+    </a>
+  </div>
+
+  {% if courses %}
+    <div class="row g-3">
+      {% for course in courses %}
+        <div class="col-12">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body position-relative">
+              <div class="row g-3 align-items-center">
+                <div class="col-9">
+                  <div class="d-flex justify-content-between align-items-start gap-2">
+                    <h5 class="card-title mb-1 course-title">
+                      <a class="stretched-link text-decoration-none" href="{% url 'school:course_detail' course.pk %}">
+                        {{ course.title }}
+                      </a>
+                    </h5>
+                  </div>
+                  <p class="card-text text-muted mb-2 small">
+                    {{ course.description|truncatechars:140 }}
+                  </p>
+                  <div class="text-muted small">
+                    Категория: {{ course.category.name }}
+                  </div>
+                  <div class="text-muted small">
+                    Преподаватель: {{ course.teacher.username|default:"—" }}
+                  </div>
+                  <div class="text-muted small">
+                    Уровень: {{ course.get_level_display }} · Цена: {{ course.price }} ₽
+                  </div>
+                  <div class="text-muted small">
+                    {{ course.start_date }} → {{ course.end_date }}
+                  </div>
+                </div>
+                <div class="col-3">
+                  {% if course.image %}
+                    <img
+                      src="{{ course.image.url }}"
+                      class="img-fluid rounded course-thumb"
+                      alt="{{ course.title }}"
+                    >
+                  {% else %}
+                    <div class="bg-light border rounded d-flex align-items-center justify-content-center text-muted course-thumb course-thumb--empty">
+                      Нет фото
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              {% if course.is_published %}
+                <span class="badge text-bg-success course-badge course-badge--corner">
+                  Опубликован
+                </span>
+              {% else %}
+                <span class="badge text-bg-secondary course-badge course-badge--corner">
+                  Черновик
+                </span>
+              {% endif %}
+            </div>
+            <div class="card-footer bg-white d-flex gap-2">
+              <a class="btn btn-outline-secondary btn-sm" href="{% url 'school:course_edit' course.pk %}">
+                Редактировать
+              </a>
+              <a class="btn btn-outline-danger btn-sm ms-auto" href="{% url 'school:course_delete' course.pk %}">
+                Удалить
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      Курсов пока нет. Добавьте первый курс.
+    </div>
+  {% endif %}
+{% endblock %}

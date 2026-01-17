@@ -1,0 +1,30 @@
+{% extends "school/base.html" %}
+
+{% block title %}Комментарий{% endblock %}
+
+{% block content %}
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h1 class="h5 mb-2">Комментарий</h1>
+          <p class="mb-1"><strong>Задача:</strong> {{ comment.task.title }}</p>
+          <p class="mb-1"><strong>Автор:</strong> {{ comment.author.username }}</p>
+          <p class="mb-0 text-muted">{{ comment.text }}</p>
+        </div>
+        <span class="badge text-bg-primary">Комментарий</span>
+      </div>
+    </div>
+    <div class="card-footer bg-white d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="{% url 'school:task_comment_edit' comment.pk %}">
+        Редактировать
+      </a>
+      <a class="btn btn-outline-danger" href="{% url 'school:task_comment_delete' comment.pk %}">
+        Удалить
+      </a>
+      <a class="btn btn-link ms-auto" href="{% url 'school:task_comment_list' %}">
+        Назад к списку
+      </a>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "school/base.html" %}
+
+{% block title %}Удаление записи{% endblock %}
+
+{% block content %}
+  <div class="card border-danger shadow-sm">
+    <div class="card-body">
+      <h1 class="h4 text-danger mb-3">Удалить запись</h1>
+      <p>Вы уверены, что хотите удалить запись студента «{{ enrollment.user.username }}»?</p>
+      <form method="post" class="d-flex gap-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a class="btn btn-outline-secondary" href="{% url 'school:enrollment_detail' enrollment.pk %}">
+          Отмена
+        </a>
+      </form>
+    </div>
+  </div>
+{% endblock %}

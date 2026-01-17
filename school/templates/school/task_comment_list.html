@@ -1,0 +1,36 @@
+{% extends "school/base.html" %}
+
+{% block title %}Комментарии{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="mb-1">Комментарии</h1>
+      <p class="text-muted mb-0">Все комментарии к задачам</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'school:task_comment_add' %}">
+      + Добавить
+    </a>
+  </div>
+
+  {% if comments %}
+    <div class="list-group shadow-sm">
+      {% for comment in comments %}
+        <a class="list-group-item list-group-item-action" href="{% url 'school:task_comment_detail' comment.pk %}">
+          <div class="d-flex justify-content-between">
+            <div>
+              <strong>{{ comment.author.username }}</strong>
+              · {{ comment.task.title }}
+            </div>
+            <small class="text-muted">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+          </div>
+          <p class="mb-0 text-muted">{{ comment.text|truncatechars:160 }}</p>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      Комментариев пока нет. Добавьте первый комментарий.
+    </div>
+  {% endif %}
+{% endblock %}

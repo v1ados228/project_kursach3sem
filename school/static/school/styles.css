@@ -51,6 +51,18 @@ form textarea {
   min-height: 120px;
 }
 
+.errorlist {
+  color: #b91c1c;
+  margin-bottom: 0.5rem;
+}
+
+.field-error input,
+.field-error select,
+.field-error textarea {
+  border-color: #dc3545;
+  background-color: #fff5f5;
+}
+
 .btn {
   transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
 }

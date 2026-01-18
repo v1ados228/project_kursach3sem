@@ -10,7 +10,19 @@
       </h1>
       <form method="post" class="vstack gap-3">
         {% csrf_token %}
-        {{ form.as_p }}
+        {% if form.errors %}
+          <div class="alert alert-danger">
+            Проверьте корректность введённых данных.
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+        {% for field in form %}
+          <p class="{% if field.errors %}field-error{% endif %}">
+            {{ field.label_tag }}
+            {{ field }}
+            {{ field.errors }}
+          </p>
+        {% endfor %}
         <div class="d-flex gap-2">
           <button type="submit" class="btn btn-primary">Сохранить</button>
           <a class="btn btn-outline-secondary" href="{% url 'school:enrollment_list' %}">Отмена</a>

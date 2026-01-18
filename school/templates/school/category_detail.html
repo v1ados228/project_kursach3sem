@@ -19,12 +19,14 @@
       </div>
     </div>
     <div class="card-footer bg-white d-flex gap-2">
-      <a class="btn btn-outline-secondary" href="{% url 'school:category_edit' category.pk %}">
-        Редактировать
-      </a>
-      <a class="btn btn-outline-danger" href="{% url 'school:category_delete' category.pk %}">
-        Удалить
-      </a>
+      {% if request.user.is_staff %}
+        <a class="btn btn-outline-secondary" href="{% url 'school:category_edit' category.pk %}">
+          Редактировать
+        </a>
+        <a class="btn btn-outline-danger" href="{% url 'school:category_delete' category.pk %}">
+          Удалить
+        </a>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

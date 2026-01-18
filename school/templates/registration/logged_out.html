@@ -1,0 +1,10 @@
+{% extends "school/base.html" %}
+
+{% block title %}Выход{% endblock %}
+
+{% block content %}
+  <div class="alert alert-success">
+    Вы вышли из системы.
+    <a href="{% url 'login' %}">Войти снова</a>
+  </div>
+{% endblock %}

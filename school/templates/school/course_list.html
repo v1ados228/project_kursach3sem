@@ -8,9 +8,11 @@
       <h1 class="mb-1">Курсы</h1>
       <p class="text-muted mb-0">Каталог курсов онлайн-школы</p>
     </div>
-    <a class="btn btn-primary" href="{% url 'school:course_add' %}">
-      + Добавить
-    </a>
+    {% if request.user.is_staff %}
+      <a class="btn btn-primary" href="{% url 'school:course_add' %}">
+        + Добавить
+      </a>
+    {% endif %}
   </div>
 
   {% if courses %}
@@ -35,7 +37,8 @@
                     Категория: {{ course.category.name }}
                   </div>
                   <div class="text-muted small">
-                    Преподаватель: {{ course.teacher.username|default:"—" }}
+                    Преподаватель:
+                    {{ course.teacher.get_full_name|default:course.teacher.username|default:"—" }}
                   </div>
                   <div class="text-muted small">
                     Уровень: {{ course.get_level_display }} · Цена: {{ course.price }} ₽
@@ -69,12 +72,14 @@
               {% endif %}
             </div>
             <div class="card-footer bg-white d-flex gap-2">
-              <a class="btn btn-outline-secondary btn-sm" href="{% url 'school:course_edit' course.pk %}">
-                Редактировать
-              </a>
-              <a class="btn btn-outline-danger btn-sm ms-auto" href="{% url 'school:course_delete' course.pk %}">
-                Удалить
-              </a>
+              {% if request.user.is_staff %}
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'school:course_edit' course.pk %}">
+                  Редактировать
+                </a>
+                <a class="btn btn-outline-danger btn-sm ms-auto" href="{% url 'school:course_delete' course.pk %}">
+                  Удалить
+                </a>
+              {% endif %}
             </div>
           </div>
         </div>

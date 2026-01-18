@@ -16,6 +16,9 @@ from .views import (
     EnrollmentCreateView,
     EnrollmentUpdateView,
     EnrollmentDeleteView,
+    EnrollmentCancelView,
+    EnrollmentFinishView,
+    SignUpView,
 )
 
 app_name = "school"
@@ -53,4 +56,15 @@ urlpatterns = [
         EnrollmentDeleteView.as_view(),
         name="enrollment_delete",
     ),
+    path(
+        "enrollments/<int:pk>/cancel/",
+        EnrollmentCancelView.as_view(),
+        name="enrollment_cancel",
+    ),
+    path(
+        "enrollments/<int:pk>/finish/",
+        EnrollmentFinishView.as_view(),
+        name="enrollment_finish",
+    ),
+    path("signup/", SignUpView.as_view(), name="signup"),
 ]

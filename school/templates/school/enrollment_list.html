@@ -16,16 +16,33 @@
   {% if enrollments %}
     <div class="list-group shadow-sm">
       {% for enrollment in enrollments %}
-        <a class="list-group-item list-group-item-action" href="{% url 'school:enrollment_detail' enrollment.pk %}">
+        <div class="list-group-item">
           <div class="d-flex justify-content-between">
             <div>
-              <strong>{{ enrollment.user.username }}</strong>
-              · {{ enrollment.course.title }}
+              <a class="text-decoration-none" href="{% url 'school:enrollment_detail' enrollment.pk %}">
+                <strong>
+                  {{ enrollment.user.get_full_name|default:enrollment.user.username }}
+                </strong>
+                · {{ enrollment.course.title }}
+              </a>
             </div>
             <span class="badge text-bg-primary">{{ enrollment.get_status_display }}</span>
           </div>
           <small class="text-muted">{{ enrollment.enrolled_at|date:"d.m.Y H:i" }}</small>
-        </a>
+          <div class="mt-2 d-flex gap-2">
+            {% if not request.user.is_staff and enrollment.status != "finished" %}
+              <a class="btn btn-outline-danger btn-sm" href="{% url 'school:enrollment_cancel' enrollment.pk %}">
+                Отменить запись
+              </a>
+              <form method="post" action="{% url 'school:enrollment_finish' enrollment.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-success btn-sm">
+                  Завершить обучение
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
       {% endfor %}
     </div>
   {% else %}

@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter, SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -14,10 +14,17 @@ from .models import Course, Enrollment
 from .serializers import CourseSerializer, EnrollmentSerializer
 
 
+class StaffWritePermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return request.user and request.user.is_authenticated
+        return request.user and request.user.is_authenticated and request.user.is_staff
+
+
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.select_related("category", "teacher")
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [StaffWritePermission]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CourseFilter
     search_fields = ["title", "description"]
@@ -124,5 +131,21 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
         if self.request.query_params.get("mine") == "1":
             queryset = queryset.filter(user=self.request.user)
         return queryset
+
+    def perform_create(self, serializer):
+        if self.request.user.is_staff:
+            serializer.save()
+        else:
+            serializer.save(user=self.request.user, status="active")
+
+    def update(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return Response({"detail": "Недостаточно прав."}, status=status.HTTP_403_FORBIDDEN)
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return Response({"detail": "Недостаточно прав."}, status=status.HTTP_403_FORBIDDEN)
+        return super().destroy(request, *args, **kwargs)
 
 

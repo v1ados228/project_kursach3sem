@@ -1,0 +1,32 @@
+{% extends "school/base.html" %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-6 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h1 class="h4 mb-3">Вход</h1>
+          <form method="post" class="vstack gap-3">
+            {% csrf_token %}
+            {% if form.errors %}
+              <div class="alert alert-danger">
+                Проверьте корректность введённых данных.
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+            {% for field in form %}
+              <p class="{% if field.errors %}field-error{% endif %}">
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+              </p>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Войти</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

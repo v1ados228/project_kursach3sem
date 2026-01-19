@@ -45,6 +45,75 @@
         </div>
       {% endfor %}
     </div>
+    {% if is_paginated %}
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">Назад</span></li>
+          {% endif %}
+
+          {% with total=page_obj.paginator.num_pages current=page_obj.number %}
+            {% if total <= 5 %}
+              {% for num in page_obj.paginator.page_range %}
+                {% if num == current %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% else %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              {% if current|add:"-2" > 1 %}
+                <li class="page-item">
+                  <a class="page-link" href="?page=1">1</a>
+                </li>
+                {% if current|add:"-3" > 1 %}
+                  <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+              {% endif %}
+
+              {% for num in page_obj.paginator.page_range %}
+                {% if num >= current|add:"-2" and num <= current|add:"2" %}
+                  {% if num == current %}
+                    <li class="page-item active">
+                      <span class="page-link">{{ num }}</span>
+                    </li>
+                  {% else %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+
+              {% if current|add:"2" < total %}
+                {% if current|add:"3" < total %}
+                  <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ total }}">{{ total }}</a>
+                </li>
+              {% endif %}
+            {% endif %}
+          {% endwith %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперёд</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">Вперёд</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
   {% else %}
     <div class="alert alert-info">
       Записей пока нет.

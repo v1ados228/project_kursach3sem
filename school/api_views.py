@@ -96,7 +96,8 @@ class CourseViewSet(viewsets.ModelViewSet):
             defaults={"status": "active"},
         )
         serializer = EnrollmentSerializer(enrollment)
-        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+        status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
+        return Response(serializer.data, status=status_code)
 
     @action(methods=["get"], detail=True)
     def history(self, request, pk=None):
@@ -140,12 +141,16 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response({"detail": "Недостаточно прав."}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"detail": "Недостаточно прав."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         if not request.user.is_staff:
-            return Response({"detail": "Недостаточно прав."}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"detail": "Недостаточно прав."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         return super().destroy(request, *args, **kwargs)
-
-

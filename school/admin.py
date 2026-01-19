@@ -12,7 +12,7 @@ from .models import (
 )
 
 
-#INLINE
+# INLINE
 
 class CourseInline(admin.TabularInline):
     model = Course
@@ -78,14 +78,14 @@ class CourseAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
     def get_export_queryset(self, request):
         queryset = super().get_export_queryset(request)
-        return queryset.filter(price__gte=5000)
+        return queryset.filter(price__gte=2000)
 
     @admin.display(description="Кол-во записей")
     def enrollment_count(self, obj):
         return obj.enrollment_set.count()
 
 
-#CATEGORY
+# CATEGORY
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -100,7 +100,7 @@ class CategoryAdmin(admin.ModelAdmin):
         return obj.course_set.count()
 
 
-#ENROLLMENT
+# ENROLLMENT
 
 @admin.register(Enrollment)
 class EnrollmentAdmin(admin.ModelAdmin):
@@ -117,7 +117,7 @@ class EnrollmentAdmin(admin.ModelAdmin):
         return obj.course.category
 
 
-#ROLE
+# ROLE
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
@@ -132,7 +132,7 @@ class RoleAdmin(admin.ModelAdmin):
         return obj.users.count()
 
 
-#ACTION LOG
+# ACTION LOG
 
 @admin.register(ActionLog)
 class ActionLogAdmin(admin.ModelAdmin):
@@ -150,4 +150,3 @@ class ActionLogAdmin(admin.ModelAdmin):
         return f"{obj.action[:27]}..."
 
     short_action.short_description = "Действие"
-

@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/macbook/Documents/Documents/ПОЛИТЕХ/Курсовая 3сем/project_morozov/venv/bin/python3" "$0" "$@"
+'''exec' "/Users/macbook/Documents/Documents/ПОЛИТЕХ/Курсовая 3сем/project_morozov/venv/bin/python" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re

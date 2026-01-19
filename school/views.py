@@ -25,6 +25,7 @@ class CategoryListView(ListView):
     model = Category
     template_name = "school/category_list.html"
     context_object_name = "categories"
+    paginate_by = 9
 
 
 class CategoryDetailView(DetailView):
@@ -56,15 +57,6 @@ class CategoryDeleteView(StaffRequiredMixin, DeleteView):
     success_url = reverse_lazy("school:category_list")
 
 
-class CourseListView(ListView):
-    model = Course
-    template_name = "school/course_list.html"
-    context_object_name = "courses"
-
-    def get_queryset(self):
-        return Course.objects.select_related("category", "teacher").order_by("-created_at")
-
-
 class CourseDetailView(DetailView):
     model = Course
     template_name = "school/course_detail.html"
@@ -85,6 +77,26 @@ class CourseDetailView(DetailView):
         else:
             context["is_enrolled"] = False
             context["user_enrollment"] = None
+        return context
+
+
+class CourseListView(ListView):
+    model = Course
+    template_name = "school/course_list.html"
+    context_object_name = "courses"
+    paginate_by = 6
+
+    def get_queryset(self):
+        queryset = Course.objects.select_related("category", "teacher").order_by("-created_at")
+        category_id = self.request.GET.get("category")
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories"] = Category.objects.order_by("name")
+        context["selected_category"] = self.request.GET.get("category", "")
         return context
 
 
@@ -115,6 +127,7 @@ class EnrollmentListView(LoginRequiredMixin, ListView):
     model = Enrollment
     template_name = "school/enrollment_list.html"
     context_object_name = "enrollments"
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = Enrollment.objects.select_related("user", "course", "course__category")
@@ -199,4 +212,3 @@ class SignUpView(CreateView):
     form_class = SignUpForm
     template_name = "registration/signup.html"
     success_url = reverse_lazy("login")
-

@@ -53,7 +53,9 @@ class CourseSerializer(serializers.ModelSerializer):
             if self.instance:
                 queryset = queryset.exclude(pk=self.instance.pk)
             if queryset.exists():
-                raise serializers.ValidationError("Название курса должно быть уникальным в категории.")
+                raise serializers.ValidationError(
+                    "Название курса должно быть уникальным в категории."
+                )
         return value
 
 
@@ -73,5 +75,3 @@ class EnrollmentSerializer(serializers.ModelSerializer):
             "enrolled_at",
         ]
         read_only_fields = ["enrolled_at"]
-
-

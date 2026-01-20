@@ -87,6 +87,39 @@ class CourseViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(methods=["get"], detail=False)
+    def complex_catalog(self, request):
+        queryset = self.get_queryset().filter(
+            (
+                Q(level="advanced")
+                | Q(title__icontains="python")
+                | Q(title__icontains="django")
+            )
+            & Q(is_published=True)
+            & ~Q(teacher=request.user)
+        )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(methods=["get"], detail=False)
+    def affordable_soon(self, request):
+        week_end = timezone.now().date() + timedelta(days=7)
+        queryset = self.get_queryset().filter(
+            (Q(price__lte=5000) | Q(start_date__lte=week_end))
+            & Q(is_published=True)
+            & ~Q(level="advanced")
+        )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     @action(methods=["post"], detail=True)
     def enroll(self, request, pk=None):
         course = self.get_object()

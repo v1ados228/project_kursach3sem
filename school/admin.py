@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.html import format_html
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
@@ -94,6 +96,7 @@ class CategoryAdmin(admin.ModelAdmin):
     list_filter = ("name",)
     search_fields = ("name",)
     inlines = [CourseInline]
+    fields = ("name", "description")
 
     @admin.display(description="Кол-во курсов")
     def course_count(self, obj):
@@ -104,13 +107,31 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Enrollment)
 class EnrollmentAdmin(admin.ModelAdmin):
-    list_display = ("user", "course", "course_category", "status", "enrolled_at")
-    list_display_links = ("user", "course")
+    list_display = (
+        "user_link",
+        "course_link",
+        "course_category",
+        "status",
+        "enrolled_at",
+    )
+    list_display_links = ("user_link", "course_link")
     list_filter = ("status", "course__category")
     search_fields = ("user__username", "course__title")
     date_hierarchy = "enrolled_at"
     raw_id_fields = ("user", "course")
     readonly_fields = ("enrolled_at",)
+    fields = ("user", "course", "status", "enrolled_at")
+
+    @admin.display(description="Пользователь")
+    def user_link(self, obj):
+        url = reverse("admin:auth_user_change", args=[obj.user_id])
+        label = obj.user.get_full_name() or obj.user.username
+        return format_html('<a href="{}">{}</a>', url, label)
+
+    @admin.display(description="Курс")
+    def course_link(self, obj):
+        url = reverse("admin:school_course_change", args=[obj.course_id])
+        return format_html('<a href="{}">{}</a>', url, obj.course.title)
 
     @admin.display(description="Категория")
     def course_category(self, obj):
@@ -126,6 +147,7 @@ class RoleAdmin(admin.ModelAdmin):
     list_filter = ("name",)
     search_fields = ("name", "users__username")
     filter_horizontal = ("users",)
+    fields = ("name", "users")
 
     @admin.display(description="Пользователей")
     def user_count(self, obj):
@@ -143,6 +165,7 @@ class ActionLogAdmin(admin.ModelAdmin):
     date_hierarchy = "action_time"
     raw_id_fields = ("user",)
     readonly_fields = ("action_time",)
+    fields = ("user", "action", "entity", "entity_id", "action_time")
 
     def short_action(self, obj):
         if len(obj.action) <= 30:

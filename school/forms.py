@@ -1,18 +1,33 @@
+"""Формы веб-интерфейса онлайн-школы."""
+
+from __future__ import annotations
+
 import re
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Category, Course, Enrollment
+from school.models import Category, Course, Enrollment
 
 
 class CategoryForm(forms.ModelForm):
+    """Форма создания и редактирования категории курсов."""
+
     class Meta:
         model = Category
         fields = ["name", "description"]
 
-    def clean_name(self):
+    def clean_name(self) -> str:
+        """
+        Валидация названия категории.
+
+        Returns:
+            Очищенное название категории.
+
+        Raises:
+            ValidationError: При нарушении правил именования.
+        """
         name = (self.cleaned_data.get("name") or "").strip()
         if not name:
             return name
@@ -32,6 +47,8 @@ class CategoryForm(forms.ModelForm):
 
 
 class CourseForm(forms.ModelForm):
+    """Форма создания и редактирования курса."""
+
     class Meta:
         model = Course
         fields = [
@@ -51,9 +68,8 @@ class CourseForm(forms.ModelForm):
             "end_date": forms.DateInput(attrs={"type": "date"}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        # Ограничиваем список преподавателей только пользователями с ролью "Преподаватель"
         self.fields["teacher"].queryset = User.objects.filter(
             roles__name__iexact="Преподаватель"
         )
@@ -61,7 +77,13 @@ class CourseForm(forms.ModelForm):
             lambda user: f"{user.first_name} {user.last_name}".strip() or user.username
         )
 
-    def clean_title(self):
+    def clean_title(self) -> str:
+        """
+        Валидация названия курса.
+
+        Returns:
+            Очищенное название курса.
+        """
         title = (self.cleaned_data.get("title") or "").strip()
         if not title:
             return title
@@ -81,7 +103,13 @@ class CourseForm(forms.ModelForm):
                 raise forms.ValidationError("Название курса должно быть уникальным в категории.")
         return title
 
-    def clean(self):
+    def clean(self) -> dict:
+        """
+        Валидация дат и цены курса.
+
+        Returns:
+            Очищенные данные формы.
+        """
         cleaned = super().clean()
         start_date = cleaned.get("start_date")
         end_date = cleaned.get("end_date")
@@ -94,21 +122,35 @@ class CourseForm(forms.ModelForm):
 
 
 class EnrollmentForm(forms.ModelForm):
+    """Форма редактирования записи (для администратора)."""
+
     class Meta:
         model = Enrollment
         fields = ["user", "course", "status"]
 
 
 class EnrollmentCreateForm(forms.ModelForm):
+    """Форма записи студента на курс."""
+
     class Meta:
         model = Enrollment
         fields = ["course"]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+        if self.user is not None:
+            self.instance.user = self.user
+            if not self.instance.pk:
+                self.instance.status = "active"
 
-    def clean_course(self):
+    def clean_course(self) -> Course:
+        """
+        Проверка дублирования записи на курс.
+
+        Returns:
+            Выбранный курс.
+        """
         course = self.cleaned_data.get("course")
         if self.user and course:
             if Enrollment.objects.filter(user=self.user, course=course).exists():
@@ -117,6 +159,8 @@ class EnrollmentCreateForm(forms.ModelForm):
 
 
 class SignUpForm(UserCreationForm):
+    """Форма регистрации нового пользователя."""
+
     first_name = forms.CharField(label="Имя", max_length=150)
     last_name = forms.CharField(label="Фамилия", max_length=150)
 

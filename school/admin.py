@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Count
 from django.urls import reverse
 from django.utils.html import format_html
 from import_export import resources
@@ -78,12 +79,22 @@ class CourseAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
         ("Системные", {"fields": ("created_at", "updated_at")}),
     )
 
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("category", "teacher")
+            .annotate(_enrollment_count=Count("enrollment"))
+        )
+
     def get_export_queryset(self, request):
         queryset = super().get_export_queryset(request)
         return queryset.filter(price__gte=2000)
 
     @admin.display(description="Кол-во записей")
     def enrollment_count(self, obj):
+        if hasattr(obj, "_enrollment_count"):
+            return obj._enrollment_count
         return obj.enrollment_set.count()
 
 
@@ -98,8 +109,13 @@ class CategoryAdmin(admin.ModelAdmin):
     inlines = [CourseInline]
     fields = ("name", "description")
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(_course_count=Count("course"))
+
     @admin.display(description="Кол-во курсов")
     def course_count(self, obj):
+        if hasattr(obj, "_course_count"):
+            return obj._course_count
         return obj.course_set.count()
 
 
@@ -121,6 +137,13 @@ class EnrollmentAdmin(admin.ModelAdmin):
     raw_id_fields = ("user", "course")
     readonly_fields = ("enrolled_at",)
     fields = ("user", "course", "status", "enrolled_at")
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("user", "course", "course__category")
+        )
 
     @admin.display(description="Пользователь")
     def user_link(self, obj):

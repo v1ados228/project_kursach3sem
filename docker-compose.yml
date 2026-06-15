@@ -5,4 +5,70 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+    environment:
+      - DEBUG=True
+      - ENABLE_SILK=True
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+      - EMAIL_HOST=mailhog
+      - EMAIL_PORT=1025
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=${SOCIAL_AUTH_GOOGLE_OAUTH2_KEY:-}
+      - SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=${SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET:-}
+      - SOCIAL_AUTH_VK_OAUTH2_KEY=${SOCIAL_AUTH_VK_OAUTH2_KEY:-}
+      - SOCIAL_AUTH_VK_OAUTH2_SECRET=${SOCIAL_AUTH_VK_OAUTH2_SECRET:-}
+    depends_on:
+      - redis
+      - mailhog
     command: sh /app/entrypoint.sh
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+      - EMAIL_HOST=mailhog
+      - EMAIL_PORT=1025
+    depends_on:
+      - redis
+      - mailhog
+    command: celery -A config worker -l info
+
+  celery-beat:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+    command: celery -A config beat -l info
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  web-prod:
+    build: .
+    ports:
+      - "8080:8000"
+    environment:
+      - DEBUG=False
+      - ENABLE_SILK=False
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+    command: gunicorn config.wsgi:application -c /app/deploy/gunicorn.conf.py
+    profiles:
+      - production

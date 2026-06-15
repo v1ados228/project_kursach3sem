@@ -29,4 +29,27 @@
       {% endif %}
     </div>
   </div>
+
+  {% if courses %}
+    <h2 class="h4 mt-4">Курсы в категории</h2>
+    <div class="row g-3">
+      {% for course in courses %}
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h3 class="h6 card-title">
+                <a href="{% url 'school:course_detail' course.pk %}">{{ course.title }}</a>
+              </h3>
+              <p class="card-text text-muted small mb-1">
+                {{ course.price }} ₽ · {{ course.get_level_display }}
+              </p>
+              <span class="badge text-bg-secondary">{{ course.enrollment_count }} записей</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted mt-4">В этой категории пока нет курсов.</p>
+  {% endif %}
 {% endblock %}

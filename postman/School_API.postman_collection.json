@@ -1,0 +1,161 @@
+{
+  "info": {
+    "name": "School API — Онлайн-школа",
+    "description": "Коллекция запросов для тестирования REST API курсовой работы",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://127.0.0.1:8000"},
+    {"key": "username", "value": "student"},
+    {"key": "password", "value": "pass1234"}
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {"key": "username", "value": "{{username}}"},
+      {"key": "password", "value": "{{password}}"}
+    ]
+  },
+  "item": [
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Список курсов",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/courses/"
+          }
+        },
+        {
+          "name": "Список курсов — фильтр по цене (min)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/courses/?price_min=3000",
+              "host": ["{{base_url}}"],
+              "path": ["api", "courses", ""],
+              "query": [{"key": "price_min", "value": "3000"}]
+            }
+          }
+        },
+        {
+          "name": "Список курсов — фильтр по категории",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/courses/?category=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "courses", ""],
+              "query": [{"key": "category", "value": "1"}]
+            }
+          }
+        },
+        {
+          "name": "Список курсов — фильтр по преподавателю",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/courses/?teacher=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "courses", ""],
+              "query": [{"key": "teacher", "value": "1"}]
+            }
+          }
+        },
+        {
+          "name": "Детали курса",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/courses/1/"
+          }
+        },
+        {
+          "name": "Создать курс (staff)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Новый курс\",\n  \"description\": \"Описание\",\n  \"category\": 1,\n  \"teacher\": 1,\n  \"price\": \"3500.00\",\n  \"level\": \"beginner\",\n  \"start_date\": \"2026-07-01\",\n  \"end_date\": \"2026-08-01\",\n  \"is_published\": true\n}"
+            },
+            "url": "{{base_url}}/api/courses/"
+          }
+        },
+        {
+          "name": "Запись на курс",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/courses/1/enroll/"
+          }
+        },
+        {
+          "name": "История изменений курса",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/courses/1/history/"
+          }
+        },
+        {
+          "name": "Курсы по категории",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/courses/category/1/"
+          }
+        },
+        {
+          "name": "Ближайшие курсы (7 дней)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/courses/upcoming/"
+          }
+        },
+        {
+          "name": "Мои курсы (преподаватель)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/courses/?mine=1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Enrollments",
+      "item": [
+        {
+          "name": "Список записей",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/enrollments/"
+          }
+        },
+        {
+          "name": "Мои записи",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/enrollments/?mine=1"
+          }
+        },
+        {
+          "name": "Фильтр по статусу",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/enrollments/?status=active",
+              "host": ["{{base_url}}"],
+              "path": ["api", "enrollments", ""],
+              "query": [{"key": "status", "value": "active"}]
+            }
+          }
+        },
+        {
+          "name": "Детали записи",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/enrollments/1/"
+          }
+        }
+      ]
+    }
+  ]
+}
